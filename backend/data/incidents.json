@@ -1,0 +1,61 @@
+[
+  {
+    "incident_id": "INC001",
+    "title": "Deployment caused API instability",
+    "severity": "critical",
+    "status": "resolved",
+    "services": ["frontend", "api", "db", "cache"],
+    "events": [
+      { "time": 0, "service": "deploy", "event": "deployment", "message": "New deployment started" },
+      { "time": 8, "service": "api", "event": "latency_spike", "message": "API latency started increasing after deployment" },
+      { "time": 16, "service": "db", "event": "timeout", "message": "Database queries began timing out under load" },
+      { "time": 25, "service": "api", "event": "service_crash", "message": "API service crashed after repeated failures" },
+      { "time": 40, "service": "db", "event": "recovery", "message": "Database recovered after load stabilized" },
+      { "time": 52, "service": "api", "event": "recovery", "message": "API restarted and returned to normal operation" }
+    ]
+  },
+  {
+    "incident_id": "INC002",
+    "title": "Queue overflow after traffic spike",
+    "severity": "high",
+    "status": "resolved",
+    "services": ["frontend", "api", "queue", "worker", "db"],
+    "events": [
+      { "time": 0, "service": "frontend", "event": "traffic_surge", "message": "Sudden traffic surge detected from end users" },
+      { "time": 10, "service": "queue", "event": "queue_overflow", "message": "Message queue exceeded safe capacity" },
+      { "time": 18, "service": "worker", "event": "service_degraded", "message": "Worker throughput degraded under queue pressure" },
+      { "time": 28, "service": "api", "event": "timeout", "message": "API requests timed out while waiting for background jobs" },
+      { "time": 42, "service": "queue", "event": "recovery", "message": "Queue size dropped back to a healthy level" },
+      { "time": 56, "service": "worker", "event": "recovery", "message": "Workers recovered after backlog drain" }
+    ]
+  },
+  {
+    "incident_id": "INC003",
+    "title": "Cache instability spread to database",
+    "severity": "medium",
+    "status": "resolved",
+    "services": ["frontend", "api", "cache", "db"],
+    "events": [
+      { "time": 0, "service": "cache", "event": "service_degraded", "message": "Cache response quality began degrading" },
+      { "time": 12, "service": "api", "event": "latency_spike", "message": "API slowed down because of cache misses" },
+      { "time": 24, "service": "db", "event": "timeout", "message": "Database load increased after cache fallback requests" },
+      { "time": 36, "service": "cache", "event": "recovery", "message": "Cache recovered after restart" },
+      { "time": 48, "service": "api", "event": "recovery", "message": "API latency returned to baseline" }
+    ]
+  },
+  {
+    "incident_id": "INC004",
+    "title": "Database saturation impacted API and frontend",
+    "severity": "critical",
+    "status": "resolved",
+    "services": ["frontend", "api", "db"],
+    "events": [
+      { "time": 0, "service": "db", "event": "latency_spike", "message": "Database write latency increased sharply" },
+      { "time": 10, "service": "db", "event": "timeout", "message": "Multiple DB transactions began timing out" },
+      { "time": 22, "service": "api", "event": "service_degraded", "message": "API degraded due to dependency instability" },
+      { "time": 30, "service": "frontend", "event": "service_degraded", "message": "Frontend started showing slow responses to users" },
+      { "time": 46, "service": "db", "event": "recovery", "message": "DB throughput recovered after traffic mitigation" },
+      { "time": 60, "service": "api", "event": "recovery", "message": "API returned to healthy state" }
+    ]
+  }
+]

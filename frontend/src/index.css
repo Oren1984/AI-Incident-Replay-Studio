@@ -1,0 +1,278 @@
+:root {
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #020617;
+  color: #e5e7eb;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.page {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.18), transparent 35%),
+    radial-gradient(circle at top right, rgba(239, 68, 68, 0.12), transparent 30%),
+    #020617;
+}
+
+.container {
+  max-width: 1450px;
+  margin: 0 auto;
+  padding: 24px;
+  display: grid;
+  gap: 20px;
+}
+
+.panel {
+  background: rgba(15, 23, 42, 0.92);
+  border: 1px solid #1e293b;
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+}
+
+.header-panel {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.title {
+  margin: 0;
+  font-size: 34px;
+}
+
+.subtitle {
+  margin: 8px 0 0;
+  color: #94a3b8;
+  max-width: 760px;
+}
+
+.header-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.select,
+.btn {
+  background: #0f172a;
+  color: #e5e7eb;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 10px 14px;
+  cursor: pointer;
+}
+
+.btn:hover,
+.select:hover {
+  border-color: #60a5fa;
+}
+
+.btn-primary {
+  background: #2563eb;
+  border-color: #2563eb;
+}
+
+.top-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.label {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #334155;
+}
+
+.badge-critical {
+  background: rgba(239, 68, 68, 0.14);
+  border-color: #ef4444;
+}
+
+.badge-high {
+  background: rgba(249, 115, 22, 0.14);
+  border-color: #f97316;
+}
+
+.badge-medium {
+  background: rgba(234, 179, 8, 0.14);
+  border-color: #eab308;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.panel-header h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.panel-header span {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.graph-box {
+  height: 500px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #020617;
+}
+
+.narrative-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.narrative-block {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.narrative-block p {
+  margin: 8px 0 0;
+  color: #cbd5e1;
+  line-height: 1.7;
+}
+
+.timeline-panel,
+.event-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.slider {
+  width: 100%;
+}
+
+.timeline-row {
+  display: flex;
+  justify-content: space-between;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.event-list {
+  display: grid;
+  gap: 12px;
+}
+
+.event-card {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-left: 4px solid #2563eb;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.event-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.event-type {
+  color: #93c5fd;
+  font-size: 12px;
+  text-transform: uppercase;
+}
+
+.event-message {
+  margin-top: 8px;
+  color: #cbd5e1;
+}
+
+.muted {
+  color: #64748b;
+}
+
+.alert-banner {
+  padding: 14px 18px;
+  font-weight: 700;
+  border-left: 5px solid transparent;
+}
+
+.alert-critical {
+  border-left-color: #ef4444;
+  background: rgba(127, 29, 29, 0.35);
+}
+
+.alert-warning {
+  border-left-color: #f59e0b;
+  background: rgba(120, 53, 15, 0.35);
+}
+
+.alert-recovery {
+  border-left-color: #22c55e;
+  background: rgba(20, 83, 45, 0.35);
+}
+
+.alert-info {
+  border-left-color: #60a5fa;
+  background: rgba(30, 41, 59, 0.8);
+}
+
+@media (max-width: 1100px) {
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .top-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .header-panel {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 700px) {
+  .top-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .title {
+    font-size: 28px;
+  }
+
+  .event-top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
