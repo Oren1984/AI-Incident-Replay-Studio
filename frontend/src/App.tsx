@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
-import ReactFlow, { Background, Controls, Edge, Node } from "reactflow";
-import "reactflow/dist/style.css";
+import ReactFlow, { Background, Controls } from "reactflow";
+import type { Edge, Node } from "reactflow";
 
 type IncidentEvent = {
   time: number;
@@ -37,6 +37,13 @@ const stateColors: Record<string, string> = {
   recovering: "#22c55e",
 };
 
+const stateGlow: Record<string, string> = {
+  healthy: "0 0 10px rgba(59,130,246,0.35)",
+  warning: "0 0 22px rgba(250,204,21,0.85), 0 0 44px rgba(250,204,21,0.25)",
+  critical: "0 0 32px rgba(239,68,68,1), 0 0 64px rgba(239,68,68,0.45)",
+  recovering: "0 0 20px rgba(34,197,94,0.75), 0 0 40px rgba(34,197,94,0.25)",
+};
+
 function getServiceState(
   events: IncidentEvent[],
   service: string,
@@ -45,36 +52,20 @@ function getServiceState(
   const serviceEvents = events.filter(
     (e) => e.service === service && e.time <= currentTime
   );
-
   if (serviceEvents.length === 0) return "healthy";
-
   const latest = serviceEvents[serviceEvents.length - 1];
-
-  if (["service_crash", "timeout", "queue_overflow"].includes(latest.event)) {
-    return "critical";
-  }
-
+  if (["service_crash", "timeout", "queue_overflow"].includes(latest.event)) return "critical";
   if (latest.event === "recovery") return "recovering";
-
-  if (
-    ["latency_spike", "service_degraded", "traffic_surge"].includes(latest.event)
-  ) {
-    return "warning";
-  }
-
+  if (["latency_spike", "service_degraded", "traffic_surge"].includes(latest.event)) return "warning";
   return "healthy";
 }
 
 function getSeverityClass(severity: string) {
   switch (severity.toLowerCase()) {
-    case "critical":
-      return "badge badge-critical";
-    case "high":
-      return "badge badge-high";
-    case "medium":
-      return "badge badge-medium";
-    default:
-      return "badge";
+    case "critical": return "badge badge-critical";
+    case "high": return "badge badge-high";
+    case "medium": return "badge badge-medium";
+    default: return "badge";
   }
 }
 
@@ -83,6 +74,14 @@ function getAlertLevel(eventType: string) {
   if (["timeout", "queue_overflow"].includes(eventType)) return "warning";
   if (eventType === "recovery") return "recovery";
   return "info";
+}
+
+function getEventCardClass(eventType: string) {
+  if (eventType === "service_crash") return "event-card event-card-critical";
+  if (["timeout", "queue_overflow", "latency_spike", "service_degraded", "traffic_surge"].includes(eventType))
+    return "event-card event-card-warning";
+  if (eventType === "recovery") return "event-card event-card-recovery";
+  return "event-card event-card-info";
 }
 
 export default function App() {
@@ -95,17 +94,89 @@ export default function App() {
   const [isMuted, setIsMuted] = useState<boolean>(true);
   const [alertMessage, setAlertMessage] = useState<string>("");
   const [alertLevel, setAlertLevel] = useState<string>("info");
+  const [criticalPopup, setCriticalPopup] = useState<string>("");
+  const [showSummary, setShowSummary] = useState<boolean>(false);
+  const [newEventIdx, setNewEventIdx] = useState<number>(-1);
 
+  const isMutedRef = useRef(true);
+  const audioCtxRef = useRef<AudioContext | null>(null);
   const lastProcessedEventRef = useRef<string>("");
-  const audioCacheRef = useRef<Record<string, HTMLAudioElement>>({});
+  const prevVisibleCountRef = useRef<number>(0);
+  const autoStopRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    isMutedRef.current = isMuted;
+  }, [isMuted]);
+
+  const getAudioCtx = useCallback((): AudioContext => {
+    if (!audioCtxRef.current) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const Ctx = window.AudioContext || (window as any).webkitAudioContext;
+      audioCtxRef.current = new Ctx() as AudioContext;
+    }
+    return audioCtxRef.current;
+  }, []);
+
+  const playSound = useCallback(
+    (name: "start" | "warning" | "critical" | "complete") => {
+      if (isMutedRef.current) return;
+      try {
+        const ctx = getAudioCtx();
+        if (ctx.state === "suspended") void ctx.resume();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        const t = ctx.currentTime;
+
+        switch (name) {
+          case "start":
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(440, t);
+            osc.frequency.exponentialRampToValueAtTime(660, t + 0.3);
+            gain.gain.setValueAtTime(0.12, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+            osc.start(t); osc.stop(t + 0.5);
+            break;
+          case "warning":
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(440, t);
+            osc.frequency.setValueAtTime(330, t + 0.15);
+            osc.frequency.setValueAtTime(440, t + 0.3);
+            gain.gain.setValueAtTime(0.12, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+            osc.start(t); osc.stop(t + 0.6);
+            break;
+          case "critical":
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(110, t);
+            osc.frequency.exponentialRampToValueAtTime(55, t + 0.6);
+            gain.gain.setValueAtTime(0.15, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.8);
+            osc.start(t); osc.stop(t + 0.8);
+            break;
+          case "complete":
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(523, t);
+            osc.frequency.exponentialRampToValueAtTime(784, t + 0.2);
+            osc.frequency.exponentialRampToValueAtTime(1046, t + 0.4);
+            gain.gain.setValueAtTime(0.12, t);
+            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+            osc.start(t); osc.stop(t + 0.6);
+            break;
+        }
+      } catch (e) {
+        console.warn("Audio synthesis failed:", e);
+      }
+    },
+    [getAudioCtx]
+  );
 
   useEffect(() => {
     axios.get(`${API_BASE}/incidents`).then((res) => {
       const data = res.data as Incident[];
       setIncidents(data);
-      if (data.length > 0) {
-        setSelectedId(data[0].incident_id);
-      }
+      if (data.length > 0) setSelectedId(data[0].incident_id);
     });
   }, []);
 
@@ -116,22 +187,26 @@ export default function App() {
 
   useEffect(() => {
     if (!selectedIncident) return;
-
     axios
       .get(`${API_BASE}/incidents/${selectedIncident.incident_id}/analysis`)
       .then((res) => setAnalysis(res.data));
-
     setCurrentTime(0);
     setIsPlaying(false);
     setAlertMessage("");
     setAlertLevel("info");
+    setShowSummary(false);
+    setCriticalPopup("");
     lastProcessedEventRef.current = "";
+    prevVisibleCountRef.current = 0;
+    autoStopRef.current = false;
   }, [selectedIncident]);
+
+  const maxTime = selectedIncident
+    ? Math.max(...selectedIncident.events.map((e) => e.time), 0)
+    : 0;
 
   useEffect(() => {
     if (!selectedIncident || !isPlaying) return;
-
-    const maxTime = Math.max(...selectedIncident.events.map((e) => e.time), 0);
 
     const timer = setInterval(() => {
       setCurrentTime((prev) => {
@@ -139,6 +214,7 @@ export default function App() {
         if (next >= maxTime) {
           clearInterval(timer);
           setIsPlaying(false);
+          autoStopRef.current = true;
           return maxTime;
         }
         return next;
@@ -146,70 +222,69 @@ export default function App() {
     }, 900);
 
     return () => clearInterval(timer);
-  }, [isPlaying, selectedIncident, speed]);
+  }, [isPlaying, selectedIncident, speed, maxTime]);
+
+  // Detect natural replay completion
+  useEffect(() => {
+    if (!isPlaying && autoStopRef.current && maxTime > 0) {
+      autoStopRef.current = false;
+      setShowSummary(true);
+      playSound("complete");
+    }
+  }, [isPlaying, maxTime, playSound]);
 
   const visibleEvents = useMemo(() => {
     if (!selectedIncident) return [];
     return selectedIncident.events.filter((e) => e.time <= currentTime);
   }, [selectedIncident, currentTime]);
 
-  const maxTime = selectedIncident
-    ? Math.max(...selectedIncident.events.map((e) => e.time), 0)
-    : 0;
+  // Track newest event for slide-in animation
+  useEffect(() => {
+    const prev = prevVisibleCountRef.current;
+    if (visibleEvents.length > prev) {
+      setNewEventIdx(visibleEvents.length - 1);
+      prevVisibleCountRef.current = visibleEvents.length;
+      const timer = setTimeout(() => setNewEventIdx(-1), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [visibleEvents.length]);
 
   const latestVisibleEvent =
     visibleEvents.length > 0 ? visibleEvents[visibleEvents.length - 1] : null;
 
-  function playSound(name: "start" | "warning" | "critical" | "complete") {
-    if (isMuted) return;
-
-    const srcMap = {
-      start: "/sounds/start.mp3",
-      warning: "/sounds/warning.mp3",
-      critical: "/sounds/critical.mp3",
-      complete: "/sounds/complete.mp3",
-    };
-
-    try {
-      if (!audioCacheRef.current[name]) {
-        audioCacheRef.current[name] = new Audio(srcMap[name]);
-        audioCacheRef.current[name].volume = 0.18;
-      }
-
-      const audio = audioCacheRef.current[name];
-      audio.currentTime = 0;
-      void audio.play();
-    } catch (error) {
-      console.error("Sound playback failed:", error);
-    }
-  }
-
   useEffect(() => {
     if (!latestVisibleEvent) return;
-
     const eventKey = `${latestVisibleEvent.service}-${latestVisibleEvent.time}-${latestVisibleEvent.event}`;
-
     if (lastProcessedEventRef.current === eventKey) return;
-
     lastProcessedEventRef.current = eventKey;
+
     setAlertMessage(
       `T+${latestVisibleEvent.time}s · ${latestVisibleEvent.service.toUpperCase()} · ${latestVisibleEvent.event}`
     );
     setAlertLevel(getAlertLevel(latestVisibleEvent.event));
 
-    if (latestVisibleEvent.time === 0) {
-      playSound("start");
-    } else if (latestVisibleEvent.event === "service_crash") {
+    if (latestVisibleEvent.event === "service_crash") {
+      const msg = `CRITICAL FAILURE — ${latestVisibleEvent.service.toUpperCase()} crashed at T+${latestVisibleEvent.time}s`;
+      setCriticalPopup(msg);
+      setTimeout(() => setCriticalPopup(""), 4000);
       playSound("critical");
     } else if (["timeout", "queue_overflow"].includes(latestVisibleEvent.event)) {
       playSound("warning");
-    } else if (
-      latestVisibleEvent.event === "recovery" &&
-      currentTime >= maxTime
-    ) {
-      playSound("complete");
+    } else if (latestVisibleEvent.time === 0) {
+      playSound("start");
     }
-  }, [latestVisibleEvent, currentTime, maxTime, isMuted]);
+  }, [latestVisibleEvent, playSound]);
+
+  function handleReset() {
+    setCurrentTime(0);
+    setIsPlaying(false);
+    setAlertMessage("");
+    setShowSummary(false);
+    setCriticalPopup("");
+    lastProcessedEventRef.current = "";
+    prevVisibleCountRef.current = 0;
+    autoStopRef.current = false;
+  }
 
   const nodes: Node[] = useMemo(() => {
     if (!selectedIncident) return [];
@@ -227,20 +302,23 @@ export default function App() {
     return selectedIncident.services.map((service) => {
       const state = getServiceState(selectedIncident.events, service, currentTime);
       const color = stateColors[state];
+      const glow = stateGlow[state];
 
       return {
         id: service,
         data: { label: `${service.toUpperCase()} · ${state}` },
         position: positions[service] || { x: 100, y: 100 },
+        className: `node-state-${state}`,
         style: {
-          background: "#0f172a",
+          background: state === "critical" ? "rgba(127,29,29,0.35)" : "#0f172a",
           color: "#e5e7eb",
           border: `2px solid ${color}`,
           borderRadius: 16,
           width: 165,
           padding: 10,
-          boxShadow: `0 0 24px ${color}`,
+          boxShadow: glow,
           fontWeight: 600,
+          transition: "all 0.5s ease",
         },
       };
     });
@@ -272,6 +350,13 @@ export default function App() {
 
   return (
     <div className="page">
+      {criticalPopup && (
+        <div className="critical-popup">
+          <span className="critical-popup-icon">⚠</span>
+          {criticalPopup}
+        </div>
+      )}
+
       <div className="container">
         <header className="panel header-panel">
           <div>
@@ -285,7 +370,10 @@ export default function App() {
             <select
               className="select"
               value={selectedId}
-              onChange={(e) => setSelectedId(e.target.value)}
+              onChange={(e) => {
+                setSelectedId(e.target.value);
+                setShowSummary(false);
+              }}
             >
               {incidents.map((incident) => (
                 <option key={incident.incident_id} value={incident.incident_id}>
@@ -294,23 +382,19 @@ export default function App() {
               ))}
             </select>
 
-            <button className="btn btn-primary" onClick={() => setIsPlaying(true)}>
-              Play
+            <button
+              className="btn btn-primary"
+              onClick={() => { setIsPlaying(true); setShowSummary(false); }}
+            >
+              ▶ Play
             </button>
 
             <button className="btn" onClick={() => setIsPlaying(false)}>
-              Pause
+              ⏸ Pause
             </button>
 
-            <button
-              className="btn"
-              onClick={() => {
-                setCurrentTime(0);
-                setIsPlaying(false);
-                setAlertMessage("");
-              }}
-            >
-              Reset
+            <button className="btn" onClick={handleReset}>
+              ↺ Reset
             </button>
 
             <select
@@ -323,8 +407,8 @@ export default function App() {
               <option value={4}>4x</option>
             </select>
 
-            <button className="btn" onClick={() => setIsMuted((prev) => !prev)}>
-              {isMuted ? "Muted" : "Sound On"}
+            <button className="btn btn-mute" onClick={() => setIsMuted((prev) => !prev)}>
+              {isMuted ? "🔇 Muted" : "🔊 Sound On"}
             </button>
           </div>
         </header>
@@ -438,11 +522,12 @@ export default function App() {
             )}
 
             {visibleEvents.map((event, idx) => (
-              <div key={`${event.service}-${event.time}-${idx}`} className="event-card">
+              <div
+                key={`${event.service}-${event.time}-${idx}`}
+                className={`${getEventCardClass(event.event)}${idx === newEventIdx ? " event-card-new" : ""}`}
+              >
                 <div className="event-top">
-                  <strong>
-                    T+{event.time}s · {event.service.toUpperCase()}
-                  </strong>
+                  <strong>T+{event.time}s · {event.service.toUpperCase()}</strong>
                   <span className="event-type">{event.event}</span>
                 </div>
                 <div className="event-message">{event.message}</div>
@@ -450,6 +535,56 @@ export default function App() {
             ))}
           </div>
         </section>
+
+        {showSummary && selectedIncident && (
+          <section className="panel summary-panel">
+            <div className="summary-header">
+              <div>
+                <h2>Replay Complete — Incident Summary</h2>
+                <p className="subtitle">Post-mortem overview</p>
+              </div>
+              <button className="btn" onClick={() => setShowSummary(false)}>
+                Dismiss
+              </button>
+            </div>
+
+            <div className="summary-grid">
+              <div className="summary-stat">
+                <span className="label">Incident</span>
+                <strong>{selectedIncident.title}</strong>
+              </div>
+              <div className="summary-stat">
+                <span className="label">Severity</span>
+                <strong className={getSeverityClass(selectedIncident.severity)}>
+                  {selectedIncident.severity.toUpperCase()}
+                </strong>
+              </div>
+              <div className="summary-stat">
+                <span className="label">Total Duration</span>
+                <strong>{maxTime}s</strong>
+              </div>
+              <div className="summary-stat">
+                <span className="label">Total Events</span>
+                <strong>{selectedIncident.events.length}</strong>
+              </div>
+              <div className="summary-stat">
+                <span className="label">Services Affected</span>
+                <strong>{selectedIncident.services.join(", ")}</strong>
+              </div>
+              <div className="summary-stat">
+                <span className="label">Final Status</span>
+                <strong>{selectedIncident.status.toUpperCase()}</strong>
+              </div>
+            </div>
+
+            {analysis && (
+              <div className="summary-narrative">
+                <p>{analysis.summary}</p>
+                <p className="summary-note">{analysis.operator_note}</p>
+              </div>
+            )}
+          </section>
+        )}
       </div>
     </div>
   );

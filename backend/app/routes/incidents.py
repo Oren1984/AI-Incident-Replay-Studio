@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
 
 from app.services.incident_service import (
-    get_all_incidents,
-    get_incident_by_id,
-    get_replay_events,
-    generate_analysis,
+    get_incidents as get_all_incidents,
+    get_incident as get_incident_by_id,
+    get_replay as get_replay_events,
+    analyze_incident as generate_analysis,
 )
 
 router = APIRouter(prefix="/incidents", tags=["incidents"])

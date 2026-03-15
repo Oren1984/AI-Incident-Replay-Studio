@@ -276,3 +276,179 @@ body {
     align-items: flex-start;
   }
 }
+
+/* ── Cinematic: Event card color variants ── */
+.event-card-critical {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-left: 4px solid #ef4444;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.event-card-warning {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-left: 4px solid #f59e0b;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.event-card-recovery {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-left: 4px solid #22c55e;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.event-card-info {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-left: 4px solid #3b82f6;
+  border-radius: 16px;
+  padding: 14px;
+}
+
+/* ── Cinematic: Event slide-in animation ── */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.event-card-new {
+  animation: slideInLeft 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* ── Cinematic: Critical popup overlay ── */
+@keyframes criticalPulse {
+  0%, 100% {
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.75);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(239, 68, 68, 1), 0 0 90px rgba(239, 68, 68, 0.4);
+  }
+}
+
+.critical-popup {
+  position: fixed;
+  top: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: rgba(127, 29, 29, 0.97);
+  border: 2px solid #ef4444;
+  border-radius: 18px;
+  padding: 16px 32px;
+  font-size: 17px;
+  font-weight: 800;
+  color: #fca5a5;
+  letter-spacing: 0.02em;
+  text-align: center;
+  min-width: 320px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  animation: criticalPulse 0.9s ease infinite;
+  pointer-events: none;
+}
+
+.critical-popup-icon {
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+/* ── Cinematic: Node critical pulse (CSS class on ReactFlow node) ── */
+@keyframes criticalNodePulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.75; }
+}
+
+.node-state-critical {
+  animation: criticalNodePulse 0.8s ease infinite;
+}
+
+/* ── Cinematic: Replay summary panel ── */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.summary-panel {
+  animation: fadeSlideUp 0.5s ease-out;
+  border-color: #22c55e;
+  box-shadow: 0 0 40px rgba(34, 197, 94, 0.2);
+}
+
+.summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.summary-header h2 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  color: #4ade80;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.summary-stat {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summary-narrative {
+  background: #0b1220;
+  border: 1px solid #1e293b;
+  border-left: 4px solid #22c55e;
+  border-radius: 16px;
+  padding: 16px;
+}
+
+.summary-narrative p {
+  margin: 0 0 10px;
+  color: #cbd5e1;
+  line-height: 1.7;
+}
+
+.summary-note {
+  color: #64748b !important;
+  font-size: 13px;
+  margin: 0 !important;
+}
+
+/* ── Mute button style ── */
+.btn-mute {
+  min-width: 110px;
+}
+
+@media (max-width: 800px) {
+  .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}

@@ -59,18 +59,20 @@ Incident Data
 
 ## Features
 
-- Incident dataset replay
-- Timeline player
+- Incident dataset replay (4 built-in incidents)
+- Timeline player with scrubbing
 - Play / Pause / Reset controls
-- Replay speed control
-- Service graph visualization
-- State-based node coloring
-- Event feed
-- Rule-based AI narrative
+- Replay speed control (1x / 2x / 4x)
+- Service graph visualization (ReactFlow)
+- State-based node glow (healthy / warning / critical / recovering)
+- Animated event feed with color-coded severity cards
+- Critical alert popup overlay
+- Replay summary panel after replay completes
+- Rule-based AI narrative (summary, root cause, impact, operator note)
 - Alert banner system
-- Sound cue support
+- Web Audio API sound cues (mutable, no files required)
 - Health endpoint
-- Dockerized runtime
+- Dockerized runtime (nginx + FastAPI)
 
 ---
 
@@ -120,38 +122,42 @@ ai-incident-replay-studio/
 
 ## Local Run
 
+### Docker (recommended)
+
 ```bash
 docker compose up --build
 ```
----
-
-## Services
 
 - Frontend: http://localhost:5173
+- Backend API: http://localhost:8000
+- In Docker, the frontend Nginx proxies `/api/*` to the backend container.
 
-- Backend: http://localhost:8000
+### Without Docker
 
-- Backend health: http://localhost:8000/health
+**Backend:**
+```bash
+cd backend
+pip install -r requirements.txt
+uvicorn app.main:app --port 8000
+```
 
----
+**Frontend:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-## Sound Files
+The frontend dev server defaults to `http://localhost:8000` for the backend — no `.env` file needed.
 
-Place these files under:
 
-frontend/public/sounds/
+## Sound System
 
-Expected filenames:
+Sound cues are synthesized in-browser using the Web Audio API — no audio files are required.
 
-- start.mp3
+Sounds are muted by default. Click **Sound On** in the header to enable them.
 
-- warning.mp3
-
-- critical.mp3
-
-- complete.mp3
-
-If sound files are missing, the application UI still works, but audio playback will not be available.
+Supported cues: replay start, warning event, critical failure, replay complete.
 
 ---
 
