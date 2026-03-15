@@ -9,7 +9,8 @@
       "Bash(sleep 1 __NEW_LINE_a3c5b96977488da7__ echo '=== Final repository structure ===' find /c/Users/ORENS/AI-Incident-Replay-Studio -not -path */.git/* -not -path */node_modules/* -not -path */__pycache__/* -not -path */dist/* -not -path */.vite/* -not -path */.claude/*)",
       "Read(//c/Users/ORENS/AI-Incident-Replay-Studio/backend/**)",
       "Bash(/dev/null du:*)",
-      "Bash(/dev/null __NEW_LINE_a3c5b96977488da7__ echo echo '=== framer-motion usage check ===' grep -r \"framer-motion\\\\|motion\\\\.\" /c/Users/ORENS/AI-Incident-Replay-Studio/frontend/src/)"
+      "Bash(/dev/null __NEW_LINE_a3c5b96977488da7__ echo echo '=== framer-motion usage check ===' grep -r \"framer-motion\\\\|motion\\\\.\" /c/Users/ORENS/AI-Incident-Replay-Studio/frontend/src/)",
+      "Bash(docker ps:*)"
     ]
   }
 }

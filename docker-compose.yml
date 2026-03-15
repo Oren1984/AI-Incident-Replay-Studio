@@ -4,7 +4,7 @@ services:
       context: ./backend
     container_name: ai-incident-backend
     ports:
-      - "8000:8000"
+      - "8004:8000"
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
