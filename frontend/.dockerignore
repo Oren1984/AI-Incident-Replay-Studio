@@ -1,3 +1,6 @@
+# frontend/.dockerignore
+# .dockerignore file to exclude unnecessary files and directories from the Docker build context
+
 node_modules
 dist
 .vite

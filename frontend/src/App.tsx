@@ -1,3 +1,7 @@
+// frontend/src/App.tsx
+// This file is the main entry point for the React application.
+// It sets up the app, manages state, and handles API interactions.
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import ReactFlow, { Background, Controls } from "reactflow";
@@ -31,17 +35,17 @@ const API_BASE =
   import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
 const stateColors: Record<string, string> = {
-  healthy: "#3b82f6",
-  warning: "#facc15",
-  critical: "#ef4444",
-  recovering: "#22c55e",
+  healthy: "#647d9e",
+  warning: "#d4914a",
+  critical: "#e05252",
+  recovering: "#4aa878",
 };
 
 const stateGlow: Record<string, string> = {
-  healthy: "0 0 10px rgba(59,130,246,0.35)",
-  warning: "0 0 22px rgba(250,204,21,0.85), 0 0 44px rgba(250,204,21,0.25)",
-  critical: "0 0 32px rgba(239,68,68,1), 0 0 64px rgba(239,68,68,0.45)",
-  recovering: "0 0 20px rgba(34,197,94,0.75), 0 0 40px rgba(34,197,94,0.25)",
+  healthy: "0 0 8px rgba(100,125,158,0.2)",
+  warning: "0 0 16px rgba(212,145,74,0.55), 0 0 32px rgba(212,145,74,0.18)",
+  critical: "0 0 24px rgba(224,82,82,0.65), 0 0 48px rgba(224,82,82,0.28)",
+  recovering: "0 0 16px rgba(74,168,120,0.55), 0 0 32px rgba(74,168,120,0.18)",
 };
 
 function getServiceState(
@@ -310,7 +314,7 @@ export default function App() {
         position: positions[service] || { x: 100, y: 100 },
         className: `node-state-${state}`,
         style: {
-          background: state === "critical" ? "rgba(127,29,29,0.35)" : "#0f172a",
+          background: state === "critical" ? "rgba(100,22,22,0.32)" : "#131929",
           color: "#e5e7eb",
           border: `2px solid ${color}`,
           borderRadius: 16,
@@ -344,7 +348,7 @@ export default function App() {
       )
       .map((edge) => ({
         ...edge,
-        style: { strokeWidth: 2.5, stroke: "#60a5fa" },
+        style: { strokeWidth: 2, stroke: "#4a6a8a" },
       }));
   }, [selectedIncident]);
 

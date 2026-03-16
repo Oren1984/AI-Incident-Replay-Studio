@@ -1,3 +1,6 @@
+# frontend/Dockerfile
+# This Dockerfile builds the frontend application using Node.js and serves it with Nginx.
+
 FROM node:20-alpine AS builder
 
 WORKDIR /app

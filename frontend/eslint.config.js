@@ -1,3 +1,8 @@
+// frontend/eslint.config.js
+// This file is used by ESLint to determine which rules to apply to which files. 
+// It is also used by the ESLint CLI to determine which files to lint. For more information, 
+// see https://eslint.org/docs/latest/use/configure/configuration-files#configuration-file-formats
+
 import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'

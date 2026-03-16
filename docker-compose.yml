@@ -1,3 +1,7 @@
+# docker-compose.yml
+# This file defines the services for the AI Incident Management System, 
+# including the backend and frontend components.
+
 services:
   backend:
     build:

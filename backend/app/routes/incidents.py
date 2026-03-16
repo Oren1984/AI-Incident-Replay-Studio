@@ -1,3 +1,6 @@
+# app/routes/incidents.py
+# This module defines the API endpoints for managing and analyzing incidents.
+
 from fastapi import APIRouter, HTTPException
 
 from app.services.incident_service import (

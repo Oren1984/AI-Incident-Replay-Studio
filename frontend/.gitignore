@@ -1,3 +1,6 @@
+# frontend/.gitignore
+# .gitignore for frontend project
+
 # Logs
 logs
 *.log

@@ -1,3 +1,7 @@
+# app/services/incident_service.py
+# This module provides functions to load incident data, retrieve specific incidents, 
+# generate replay timelines, and perform analysis to produce human-readable summaries and insights.
+
 import json
 from pathlib import Path
 

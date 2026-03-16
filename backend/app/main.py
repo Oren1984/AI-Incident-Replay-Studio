@@ -1,3 +1,7 @@
+# app/main.py
+# This file is the entry point for the FastAPI application.
+# It sets up the app, configures CORS, and includes the API routes.
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
