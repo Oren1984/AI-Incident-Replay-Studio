@@ -1,226 +1,86 @@
-# AI Incident Replay Studio  http://localhost:5173
+# NeuroOps Incident Replay
 
-AI Incident Replay Studio is an interactive incident investigation platform that replays system failures as a visual timeline experience.
+AI-powered incident investigation platform that replays system failures as an interactive, timeline-driven experience.
 
-Instead of showing logs as static text, the platform presents incidents as a replayable operational story:
+Instead of static logs, the system presents incidents as a dynamic operational story — combining visualization, replay logic, and AI-style explanations.
 
-- timeline progression
-- service state transitions
-- live event feed
-- AI-generated narrative
-- alert banners
-- optional sound cues
-- Docker-based local runtime
+---
+
+## Core Capabilities
+
+- Timeline-based incident replay
+- Service state transitions visualization
+- Live event stream with severity levels
+- AI-style incident narrative (summary, root cause, impact)
+- Alert banners and critical overlays
+- Replay controls (play, pause, speed, reset)
+- Sound cues (Web Audio API, optional)
 
 ---
 
 ## Core Idea
 
-The system simulates incident investigation as a cinematic observability experience.
+The platform transforms incident investigation into a **cinematic observability experience**.
 
-It allows the user to:
+Users can:
 
-- play an incident replay
-- observe how a failure spreads across services
-- inspect event evolution over time
-- read a structured AI-style investigation summary
-- experience a dashboard that feels closer to a SOC investigation tool than a standard monitoring page
+- Replay incidents step-by-step
+- Observe failure propagation across services
+- Inspect event sequences in real time
+- Understand incidents through structured AI explanations
 
 ---
 
 ## Architecture
 
-Incident Data  
-→ Backend API  
-→ Replay Engine  
-→ Frontend Visualization  
+Incident Data
+→ Backend API (FastAPI)
+→ Replay Engine
+→ Frontend Visualization (React + ReactFlow)
 → AI Narrative Layer
 
 ---
 
 ## Tech Stack
 
-### Backend
-- FastAPI
-- Python
-- Pydantic
+**Backend**
+Python • FastAPI • Pydantic
 
-### Frontend
-- React
-- Vite
-- React Flow
+**Frontend**
+React • Vite • ReactFlow
 
-### Runtime
-- Docker
-- Docker Compose
-- Nginx (frontend production container)
+**Runtime**
+Docker • Docker Compose • Nginx
 
 ---
 
-## Features
+## Run Instructions
 
-- Incident dataset replay (4 built-in incidents)
-- Timeline player with scrubbing
-- Play / Pause / Reset controls
-- Replay speed control (1x / 2x / 4x)
-- Service graph visualization (ReactFlow)
-- State-based node glow (healthy / warning / critical / recovering)
-- Animated event feed with color-coded severity cards
-- Critical alert popup overlay
-- Replay summary panel after replay completes
-- Rule-based AI narrative (summary, root cause, impact, operator note)
-- Alert banner system
-- Web Audio API sound cues (mutable, no files required)
-- Health endpoint
-- Dockerized runtime (nginx + FastAPI)
-
----
-
-## API Endpoints
-
-- `GET /incidents`
-- `GET /incidents/{id}`
-- `GET /incidents/{id}/replay`
-- `GET /incidents/{id}/analysis`
-- `GET /health`
-
----
-
-## Project Structure
-
-```text
-ai-incident-replay-studio/
-├── backend/
-│   ├── app/
-│   │   ├── main.py
-│   │   ├── models/
-│   │   ├── routes/
-│   │   └── services/
-│   ├── data/
-│   │   └── incidents.json
-│   ├── Dockerfile
-│   └── requirements.txt
-│
-├── frontend/
-│   ├── public/
-│   │   └── sounds/
-│   ├── src/
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   └── index.css
-│   ├── .env.example
-│   ├── Dockerfile
-│   ├── nginx.conf
-│   ├── package.json
-│   └── vite.config.ts
-│
-├── docker-compose.yml
-└── README.md
-```
-
----
-
-## Local Run
-
-### Docker (recommended)
+### Docker (recommended):
 
 ```bash
 docker compose up --build
 ```
 
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:8000
-- In Docker, the frontend Nginx proxies `/api/*` to the backend container.
+Frontend: http://localhost:5173
+Backend: http://localhost:8000
 
-### Without Docker
+### Local (without Docker):
 
-**Backend:**
 ```bash
+# Backend
 cd backend
 pip install -r requirements.txt
 uvicorn app.main:app --port 8000
-```
 
-**Frontend:**
-```bash
+# Frontend
 cd frontend
 npm install
 npm run dev
 ```
 
-The frontend dev server defaults to `http://localhost:8000` for the backend — no `.env` file needed.
-
-
-## Sound System
-
-Sound cues are synthesized in-browser using the Web Audio API — no audio files are required.
-
-Sounds are muted by default. Click **Sound On** in the header to enable them.
-
-Supported cues: replay start, warning event, critical failure, replay complete.
-
 ---
 
-## Current Scope
+## Summary
 
-### This version focuses on:
-
-- replayable incident simulation
-
-- service relationship visualization
-
-- frontend-backend integration
-
-- portfolio-grade observability storytelling
-
-
-### Possible future upgrades:
-
-- real LLM-generated narrative
-
-- incident upload
-
-- advanced timeline scrubbing
-
-- persistent incident storage
-
-- authentication
-
-- multi-incident comparison
-
-- production reverse proxy and domain deployment
-
----
-
-## Portfolio Value
-
-This project stands out because it is not just another dashboard or API.
-
-### It combines:
-
-- backend engineering
-
-- replay logic
-
-- frontend visualization
-
-- observability concepts
-
-- operational storytelling
-
-- AI-style incident explanation
-
-
-### That makes it a strong portfolio project for roles around:
-
-- Applied AI Engineering
-
-- MLOps
-
-- Observability Engineering
-
-- Platform Engineering
-
-- AI Product Prototyping
-
----
+NeuroOps Incident Replay demonstrates how incident investigation can evolve from static logs into an interactive, visual, and explainable experience.

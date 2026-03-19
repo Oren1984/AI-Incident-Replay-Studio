@@ -364,7 +364,7 @@ export default function App() {
       <div className="container">
         <header className="panel header-panel">
           <div>
-            <h1 className="title">AI Incident Replay Studio</h1>
+            <h1 className="title">NeuroOps Incident Replay</h1>
             <p className="subtitle">
               Visual incident investigation with replay, system flow, AI narrative, and alert sound cues
             </p>
